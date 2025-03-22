@@ -244,7 +244,7 @@ def get_srt_file(video_name):
     write(output, f"Capcut_SRT/{video_name}.srt")
     time.sleep(1)
     while True:
-        if delete_folder(f"{projects_path}\{project}") == True:
+        if delete_folder(fr"{projects_path}\{project}") == True:
             break
         time.sleep(1)
     print("[+]Successfully SRT file extracted with the name: ", f"Capcut_SRT/{video_name}.srt")
@@ -303,7 +303,7 @@ def main():
     project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
     for i in project:
         while True:
-            if not delete_folder(f"{projects_path}\{i}"):
+            if not delete_folder(fr"{projects_path}\{i}"):
                 time.sleep(1)
                 continue
 

@@ -105,6 +105,8 @@ def create_new_project(video_path):
         else:
             print("Could not find New Project button")
             return False
+        gw.getWindowsWithTitle("剪映专业版")[0].maximize()
+        time.sleep(2)
             
         # Import video
         import_video_pos = pyautogui.locateCenterOnScreen('./assets/import_media.png', confidence=0.8)

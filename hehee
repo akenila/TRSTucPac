@@ -279,67 +279,75 @@ def delete_folder(path):
 def main():
     # Select folder with videos
     start = input("Press Enter to start...")
-    video_folder = select_folder()
-    if not video_folder:
-        print("No folder selected. Exiting...")
-        return
-        
-    # Get list of video files
-    video_files = get_video_files(video_folder)
-    if not video_files:
-        print("No video files found in the selected folder. Exiting...")
-        return
-    
-    print(f"Found {len(video_files)} video files to process.")
-    
-    # Open Capcut
-    if not open_capcut():
-        return
-    
-    # Process each video
-    capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"
-    projects_path = capcut_path + r"\User Data\Projects\com.lveditor.draft"
+    while True:
+        try:
+            video_folder = select_folder()
+            if not video_folder:
+                print("No folder selected. Exiting...")
+                return
+                
+            # Get list of video files
+            video_files = get_video_files(video_folder)
+            if not video_files:
+                print("No video files found in the selected folder. Exiting...")
+                return
+            
+            print(f"Found {len(video_files)} video files to process.")
+            
+            # Open Capcut
+            if not open_capcut():
+                return
+            
+            # Process each video
+            capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"
+            projects_path = capcut_path + r"\User Data\Projects\com.lveditor.draft"
 
-    project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
-    for i in project:
-        while True:
-            if not delete_folder(fr"{projects_path}\{i}"):
-                time.sleep(1)
-                continue
+            project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
+            for i in project:
+                while True:
+                    if not delete_folder(fr"{projects_path}\{i}"):
+                        time.sleep(1)
+                        continue
 
-    for i, video_path in enumerate(video_files):
-        video_name = os.path.basename(video_path)
-        print(f"\nProcessing video {i+1}/{len(video_files)}: {video_name}")
-        while True:
-            try:
-                if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
-                    break
-                time.sleep(1)
-            except Exception as e:
-                continue
-        
-        # Create new project with the video
-        if not create_new_project(video_path):
-            print(f"Failed to create project for {video_name}. Skipping...")
+            for i, video_path in enumerate(video_files):
+                video_name = os.path.basename(video_path)
+                print(f"\nProcessing video {i+1}/{len(video_files)}: {video_name}")
+                while True:
+                    try:
+                        if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
+                            break
+                        time.sleep(1)
+                    except Exception as e:
+                        continue
+                
+                # Create new project with the video
+                if not create_new_project(video_path):
+                    print(f"Failed to create project for {video_name}. Skipping...")
+                    continue
+                    
+                # Generate auto subtitles
+                if not generate_auto_subtitles():
+                    print(f"Failed to generate subtitles for {video_name}. Skipping...")
+                    
+                # Close the project
+                if not close_project():
+                    print(f"Failed to close project for {video_name}.")
+                while True:
+                    try:
+                        if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
+                            break
+                        time.sleep(1)
+                    except Exception as e:
+                        continue
+                get_srt_file(video_name)
+            open_subtitle_edit()
+            print("\nAll videos processed. Task completed.")
+            choice = input("Do you want to continue? (y/n): ")
+            if choice.lower() != 'y':
+                break
+        except Exception as e:
+            print(f"Error: {e}")
             continue
-            
-        # Generate auto subtitles
-        if not generate_auto_subtitles():
-            print(f"Failed to generate subtitles for {video_name}. Skipping...")
-            
-        # Close the project
-        if not close_project():
-            print(f"Failed to close project for {video_name}.")
-        while True:
-            try:
-                if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
-                    break
-                time.sleep(1)
-            except Exception as e:
-                continue
-        get_srt_file(video_name)
-    open_subtitle_edit()
-    print("\nAll videos processed. Task completed.")
 
 if __name__ == "__main__":
     main()

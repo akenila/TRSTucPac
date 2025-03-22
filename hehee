@@ -117,31 +117,25 @@ def create_new_project(video_path):
             pyperclip.copy(video_path)  # Copy path to clipboard
             pyautogui.hotkey('ctrl', 'v')
             time.sleep(2)
+            pyautogui.press('enter')
             
-            # Click Open to get to the media browser
-            open_button_pos = pyautogui.locateCenterOnScreen('./assets/ok_button.png', confidence=0.8)
-            if open_button_pos:
-                pyautogui.click(open_button_pos)
-                time.sleep(3)
-                
-                # Get screen dimensions
-                screen_width, screen_height = pyautogui.size()
-                
-                video_in_panel_pos = (screen_width * 0.1, screen_height * 0.19)
-                
-                # Define the drop target (timeline/lower half of app)
-                drop_target = (screen_width * 0.5, screen_height * 0.75)
-                
-                # Perform the drag and drop
-                pyautogui.moveTo(video_in_panel_pos)
-                pyautogui.mouseDown()
-                time.sleep(0.5)  # Brief pause before dragging
-                pyautogui.moveTo(drop_target, duration=1.0)  # Slow drag movement
-                pyautogui.mouseUp()
-                time.sleep(2)  # Wait for the drop to be processed
-            else:
-                print("Could not find Open button")
-                return False
+            time.sleep(3)
+            
+            # Get screen dimensions
+            screen_width, screen_height = pyautogui.size()
+            
+            video_in_panel_pos = (screen_width * 0.1, screen_height * 0.19)
+            
+            # Define the drop target (timeline/lower half of app)
+            drop_target = (screen_width * 0.5, screen_height * 0.75)
+            
+            # Perform the drag and drop
+            pyautogui.moveTo(video_in_panel_pos)
+            pyautogui.mouseDown()
+            time.sleep(0.5)  # Brief pause before dragging
+            pyautogui.moveTo(drop_target, duration=1.0)  # Slow drag movement
+            pyautogui.mouseUp()
+            time.sleep(2)  # Wait for the drop to be processed
         else:
             print("Could not find Import Media button")
             return False
@@ -253,7 +247,7 @@ def delete_folder(path):
         # Check if the path exists
         if not os.path.exists(path):
             print(f"Path does not exist: {path}")
-            return False
+            return None
             
         # Check if it's a file
         if os.path.isfile(path):
@@ -315,7 +309,7 @@ def main():
             project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
             for i in project:
                 while True:
-                    if not delete_folder(fr"{projects_path}\{i}"):
+                    if delete_folder(fr"{projects_path}\{i}")==False:
                         time.sleep(1)
                         continue
 

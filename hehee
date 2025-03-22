@@ -1,0 +1,345 @@
+def extract(path):
+    with open(path, 'r', encoding="utf-8") as file:
+        return json.load(file)
+
+
+def write(data, filename):
+    with open(filename, 'w', encoding="utf-8") as file:
+        file.write(data)
+
+
+def ms_to_srt(time_in_ms):
+    convert_ms = int(time_in_ms / 1000)
+    ms = convert_ms % 1000
+    total_seconds = (convert_ms - ms) / 1000
+    seconds = int(total_seconds % 60)
+    total_minutes = (total_seconds - seconds) / 60
+    minutes = int(total_minutes % 60)
+    hour = int((total_minutes - minutes) / 60)
+
+    return f'{hour:02}:{minutes:02}:{seconds:02},{ms:03}'
+
+
+def scrap_subs(content):
+    subtitles_info = []
+    materials = content['materials']
+    sub_timing = content['tracks'][1]['segments']
+
+    for m in materials['texts']:
+        content = json.loads(m['content'])['text']
+
+        segment = next(seg for seg in sub_timing if seg['material_id'] == m['id'])
+        start = segment['target_timerange']['start']
+        end = start + segment['target_timerange']['duration']
+        timestamp = f'{ms_to_srt(start)} --> {ms_to_srt(end)}'
+        index = len(subtitles_info) + 1
+
+        subtitles_info.append({
+            'index': index,
+            'timestamp': timestamp,
+            'content': content
+        })
+
+    return subtitles_info
+
+def select_folder():
+    """Open dialog to select folder with videos"""
+    root = Tk()
+    root.withdraw()  # Hide the main window
+    folder_path = filedialog.askdirectory(title="Select folder with videos")
+    root.destroy()
+    return folder_path
+
+def get_video_files(folder_path):
+    """Get list of video files from the folder"""
+    video_extensions = ['.mp4', '.avi', '.mov', '.mkv', '.wmv']
+    video_files = []
+    
+    for file in os.listdir(folder_path):
+        if any(file.lower().endswith(ext) for ext in video_extensions):
+            video_files.append(os.path.join(folder_path, file))
+    
+    return video_files
+
+def open_capcut():
+    """Open Capcut application or restore if minimized"""
+    try:
+        # Check if Capcut is already running
+        capcut_windows = gw.getWindowsWithTitle("剪映专业版")
+        
+        if capcut_windows:
+            # Capcut is already running
+            capcut_window = capcut_windows[0]
+            
+            # Check if window is minimized
+            if capcut_window.isMinimized:
+                print("Restoring minimized Capcut window...")
+                capcut_window.restore()
+            
+            # Activate and focus on the window
+            capcut_window.activate()
+            time.sleep(2)  # Wait for window to become active
+            print("Capcut window activated")
+            
+        else:
+            # Capcut is not running, launch it
+            capcut_path = r"C:\Users\Admin\AppData\Local\JianyingPro\Apps\JianyingPro.exe"
+            subprocess.Popen(capcut_path)
+            print("Opening Capcut...")
+            time.sleep(5)  # Wait for Capcut to open
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error with Capcut: {e}")
+        return False
+
+def create_new_project(video_path):
+    """Create a new project with the video"""
+    try:
+        # Click "New Project" button
+        new_project_pos = pyautogui.locateCenterOnScreen('create_project.png', confidence=0.8)
+        if new_project_pos:
+            pyautogui.click(new_project_pos)
+            time.sleep(2)
+        else:
+            print("Could not find New Project button")
+            return False
+            
+        # Import video
+        import_video_pos = pyautogui.locateCenterOnScreen('import_media.png', confidence=0.8)
+        if import_video_pos:
+            pyautogui.click(import_video_pos)
+            time.sleep(1)
+            
+            # Type the path to the video file
+            video_path = video_path.replace('/', '\\')  # Replace forward slashes with backslashes
+            pyperclip.copy(video_path)  # Copy path to clipboard
+            pyautogui.hotkey('ctrl', 'v')
+            time.sleep(2)
+            
+            # Click Open to get to the media browser
+            open_button_pos = pyautogui.locateCenterOnScreen('ok_button.png', confidence=0.8)
+            if open_button_pos:
+                pyautogui.click(open_button_pos)
+                time.sleep(3)
+                
+                # Get screen dimensions
+                screen_width, screen_height = pyautogui.size()
+                
+                video_in_panel_pos = (screen_width * 0.1, screen_height * 0.19)
+                
+                # Define the drop target (timeline/lower half of app)
+                drop_target = (screen_width * 0.5, screen_height * 0.75)
+                
+                # Perform the drag and drop
+                pyautogui.moveTo(video_in_panel_pos)
+                pyautogui.mouseDown()
+                time.sleep(0.5)  # Brief pause before dragging
+                pyautogui.moveTo(drop_target, duration=1.0)  # Slow drag movement
+                pyautogui.mouseUp()
+                time.sleep(2)  # Wait for the drop to be processed
+            else:
+                print("Could not find Open button")
+                return False
+        else:
+            print("Could not find Import Media button")
+            return False
+            
+        return True
+    except Exception as e:
+        print(f"Error creating new project: {e}")
+        return False
+def generate_auto_subtitles():
+        # Click on Auto Captions or Subtitle button
+        subtitle_pos = pyautogui.locateCenterOnScreen('subtitle.png', confidence=0.8)
+        if subtitle_pos:
+            pyautogui.click(subtitle_pos)
+            time.sleep(2)
+            
+            # Click on Auto Captions
+            auto_captions_pos = pyautogui.locateCenterOnScreen('auto_caption.png', confidence=0.8)
+            if auto_captions_pos:
+                pyautogui.click(auto_captions_pos)
+                time.sleep(2)
+                
+                screen_width, screen_height = pyautogui.size()
+                
+                video_in_panel_pos = (screen_width * 0.1, screen_height * 0.22)
+                pyautogui.click(video_in_panel_pos)
+                time.sleep(2)
+                while True:
+                    time.sleep(3)
+                    # Check if the Run button is still visible
+                    try:
+                        run_button_pos = pyautogui.locateCenterOnScreen('loading.png', confidence=0.8)
+
+                        if not run_button_pos:
+                            break
+                    except Exception as e:
+                        break
+                    print("Waiting for subtitles to generate...")
+                time.sleep(2)
+            else:
+                print("Could not find Auto Captions button")
+                return False
+        else:
+            print("Could not find Subtitle button")
+            return False
+            
+        return True
+def close_project():
+    """Close the current project"""
+    try:
+        gw.getWindowsWithTitle("剪映专业版")[0].close()
+            
+        return True
+    except Exception as e:
+        print(f"Error closing project: {e}")
+        return False
+def open_subtitle_edit():
+        # Path to Subtitle Edit executable - ADJUST THIS PATH to your installation
+        subtitle_edit_path = r"C:\Program Files\Subtitle Edit\SubtitleEdit.exe"
+        
+        # Get the absolute path to the SRT files folder
+        srt_folder = "./Capcut_SRT"
+        for file_name in os.listdir(srt_folder):
+            srt_file = os.path.join(srt_folder, file_name)
+            name = os.path.basename(srt_file)
+            
+            print(f"Opening Subtitle Edit with folder: {srt_file}")
+            
+            # Launch Subtitle Edit and open the folder
+            subprocess.Popen([subtitle_edit_path, srt_file])
+            while not gw.getWindowsWithTitle(f'{name} - Subtitle Edit'):
+                time.sleep(1)
+            gw.getWindowsWithTitle(f'{name} - Subtitle Edit')[0].maximize()
+            screen_width, screen_height = pyautogui.size()
+            tools_button = (screen_width*0.05, screen_height*0.03)
+            pyautogui.click(tools_button)
+            time.sleep(1)
+            merge_button = (screen_width*0.05, screen_height*0.21)
+            pyautogui.click(merge_button)
+            time.sleep(1)
+            pyautogui.hotkey('tab')
+            pyautogui.hotkey('tab')
+            pyautogui.hotkey('enter')
+            pyautogui.hotkey('ctrl', 's')
+            time.sleep(1)
+            gw.getWindowsWithTitle(f'{name} - Subtitle Edit')[0].close()
+            print(f"Subtitle Edit successfully saved the file: {srt_file}")
+        return True
+def get_srt_file(video_name):
+    if os.path.exists("Capcut_SRT") == False:
+        os.mkdir("Capcut_SRT")
+    capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"
+    projects_path = capcut_path + r"\User Data\Projects\com.lveditor.draft"
+
+    project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']][0]
+
+    draft = fr"{projects_path}\{project}\draft_content.json"
+    subtitles = scrap_subs(extract(draft))
+
+    output = ''.join([f'{s["index"]}\n{s["timestamp"]}\n{s["content"]}\n\n' for s in subtitles])
+    write(output, f"Capcut_SRT/{video_name}.srt")
+    time.sleep(1)
+    while True:
+        if delete_folder(f"{projects_path}\{project}") == True:
+            break
+        time.sleep(1)
+    print("[+]Successfully SRT file extracted with the name: ", f"Capcut_SRT/{video_name}.srt")
+def delete_folder(path):
+    try:
+        # Check if the path exists
+        if not os.path.exists(path):
+            print(f"Path does not exist: {path}")
+            return False
+            
+        # Check if it's a file
+        if os.path.isfile(path):
+            os.remove(path)
+            print(f"Removed file: {path}")
+            return True
+            
+        # If it's a directory, process all contents first
+        for item in os.listdir(path):
+            item_path = os.path.join(path, item)
+            
+            # Recursively delete files and subdirectories
+            delete_folder(item_path)
+            
+        # After all contents are deleted, remove the directory itself
+        os.rmdir(path)
+        print(f"Removed directory: {path}")
+        return True
+        
+    except Exception as e:
+        print(f"Error while deleting {path}: {e}")
+        return False
+def main():
+    # Select folder with videos
+    start = input("Press Enter to start...")
+    video_folder = select_folder()
+    if not video_folder:
+        print("No folder selected. Exiting...")
+        return
+        
+    # Get list of video files
+    video_files = get_video_files(video_folder)
+    if not video_files:
+        print("No video files found in the selected folder. Exiting...")
+        return
+    
+    print(f"Found {len(video_files)} video files to process.")
+    
+    # Open Capcut
+    if not open_capcut():
+        return
+    
+    # Process each video
+    capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"
+    projects_path = capcut_path + r"\User Data\Projects\com.lveditor.draft"
+
+    project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
+    for i in project:
+        while True:
+            if not delete_folder(f"{projects_path}\{i}"):
+                time.sleep(1)
+                continue
+
+    for i, video_path in enumerate(video_files):
+        video_name = os.path.basename(video_path)
+        print(f"\nProcessing video {i+1}/{len(video_files)}: {video_name}")
+        while True:
+            try:
+                if pyautogui.locateCenterOnScreen('create_project.png', confidence=0.8):
+                    break
+                time.sleep(1)
+            except Exception as e:
+                continue
+        
+        # Create new project with the video
+        if not create_new_project(video_path):
+            print(f"Failed to create project for {video_name}. Skipping...")
+            continue
+            
+        # Generate auto subtitles
+        if not generate_auto_subtitles():
+            print(f"Failed to generate subtitles for {video_name}. Skipping...")
+            
+        # Close the project
+        if not close_project():
+            print(f"Failed to close project for {video_name}.")
+        while True:
+            try:
+                if pyautogui.locateCenterOnScreen('create_project.png', confidence=0.8):
+                    break
+                time.sleep(1)
+            except Exception as e:
+                continue
+        get_srt_file(video_name)
+    open_subtitle_edit()
+    print("\nAll videos processed. Task completed.")
+
+if __name__ == "__main__":
+    main()

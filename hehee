@@ -83,7 +83,7 @@ def open_capcut():
             
         else:
             # Capcut is not running, launch it
-            capcut_path = r"C:\Users\Admin\AppData\Local\JianyingPro\Apps\JianyingPro.exe"
+            capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro\Apps\JianyingPro.exe"    
             subprocess.Popen(capcut_path)
             print("Opening Capcut...")
             time.sleep(5)  # Wait for Capcut to open
@@ -284,19 +284,29 @@ def main():
             video_folder = select_folder()
             if not video_folder:
                 print("No folder selected. Exiting...")
-                return
+                choice = input("Do you want to continue? (y/n): ")
+                if choice.lower() != 'y':   
+                    break
+                continue
                 
             # Get list of video files
             video_files = get_video_files(video_folder)
             if not video_files:
                 print("No video files found in the selected folder. Exiting...")
-                return
+                choice = input("Do you want to continue? (y/n): ")
+                if choice.lower() != 'y':
+                    break
+                continue
             
             print(f"Found {len(video_files)} video files to process.")
             
             # Open Capcut
             if not open_capcut():
-                return
+                print("Failed to open Capcut. Exiting")
+                choice = input("Do you want to continue? (y/n): ")
+                if choice.lower() != 'y':
+                    break   
+                continue
             
             # Process each video
             capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"

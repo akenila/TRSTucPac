@@ -98,7 +98,7 @@ def create_new_project(video_path):
     """Create a new project with the video"""
     try:
         # Click "New Project" button
-        new_project_pos = pyautogui.locateCenterOnScreen('create_project.png', confidence=0.8)
+        new_project_pos = pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8)
         if new_project_pos:
             pyautogui.click(new_project_pos)
             time.sleep(2)
@@ -107,7 +107,7 @@ def create_new_project(video_path):
             return False
             
         # Import video
-        import_video_pos = pyautogui.locateCenterOnScreen('import_media.png', confidence=0.8)
+        import_video_pos = pyautogui.locateCenterOnScreen('./assets/import_media.png', confidence=0.8)
         if import_video_pos:
             pyautogui.click(import_video_pos)
             time.sleep(1)
@@ -119,7 +119,7 @@ def create_new_project(video_path):
             time.sleep(2)
             
             # Click Open to get to the media browser
-            open_button_pos = pyautogui.locateCenterOnScreen('ok_button.png', confidence=0.8)
+            open_button_pos = pyautogui.locateCenterOnScreen('./assets/ok_button.png', confidence=0.8)
             if open_button_pos:
                 pyautogui.click(open_button_pos)
                 time.sleep(3)
@@ -152,13 +152,13 @@ def create_new_project(video_path):
         return False
 def generate_auto_subtitles():
         # Click on Auto Captions or Subtitle button
-        subtitle_pos = pyautogui.locateCenterOnScreen('subtitle.png', confidence=0.8)
+        subtitle_pos = pyautogui.locateCenterOnScreen('./assets/subtitle.png', confidence=0.8)
         if subtitle_pos:
             pyautogui.click(subtitle_pos)
             time.sleep(2)
             
             # Click on Auto Captions
-            auto_captions_pos = pyautogui.locateCenterOnScreen('auto_caption.png', confidence=0.8)
+            auto_captions_pos = pyautogui.locateCenterOnScreen('./assets/auto_caption.png', confidence=0.8)
             if auto_captions_pos:
                 pyautogui.click(auto_captions_pos)
                 time.sleep(2)
@@ -172,7 +172,7 @@ def generate_auto_subtitles():
                     time.sleep(3)
                     # Check if the Run button is still visible
                     try:
-                        run_button_pos = pyautogui.locateCenterOnScreen('loading.png', confidence=0.8)
+                        run_button_pos = pyautogui.locateCenterOnScreen('./assets/loading.png', confidence=0.8)
 
                         if not run_button_pos:
                             break
@@ -312,7 +312,7 @@ def main():
         print(f"\nProcessing video {i+1}/{len(video_files)}: {video_name}")
         while True:
             try:
-                if pyautogui.locateCenterOnScreen('create_project.png', confidence=0.8):
+                if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
                     break
                 time.sleep(1)
             except Exception as e:
@@ -332,7 +332,7 @@ def main():
             print(f"Failed to close project for {video_name}.")
         while True:
             try:
-                if pyautogui.locateCenterOnScreen('create_project.png', confidence=0.8):
+                if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
                     break
                 time.sleep(1)
             except Exception as e:

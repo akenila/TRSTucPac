@@ -211,7 +211,7 @@ def generate_auto_subtitles():
 #     return True
 
 def close_project():
-    time.sleep(2)
+    time.sleep(4)
     gw.getWindowsWithTitle("剪映专业版")[0].close()
     d=5
     while d>=0:

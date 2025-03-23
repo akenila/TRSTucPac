@@ -190,23 +190,47 @@ def generate_auto_subtitles():
             return False
             
         return True
+# def close_project():
+#     """Close the current project"""
+#     while True:
+#         if gw.getWindowsWithTitle("剪映专业版"):
+#             pyautogui.hotkey('ctrl', 'w')
+#             time.sleep(0.5)
+#         else:
+#             break
+#     capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"
+#     projects_path = capcut_path + r"\User Data\Projects\com.lveditor.draft"
+
+#     project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
+#     for i in project:
+#         while True:
+#             if delete_folder(fr"{projects_path}\{i}")==True or delete_folder(fr"{projects_path}\{i}")==None:
+#                 break
+#             time.sleep(1)
+#     open_capcut()
+#     return True
+
 def close_project():
-    """Close the current project"""
+    time.sleep(2)
+    gw.getWindowsWithTitle("剪映专业版")[0].close()
+    d=5
+    while d>=0:
+        try:
+            if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
+                return True
+            time.sleep(1)
+            d-=1
+        except Exception as e:
+            d-=1
+            pass
     try:
-            gw.getWindowsWithTitle("剪映专业版")[0].close()
-            time.sleep(5)
-            d=5
-            while d>=0:
-                try:
-                    if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
-                        return True
-                    time.sleep(1)
-                    d-=1
-                except Exception as e:
-                    close_project()
+        if pyautogui.locateCenterOnScreen('./assets/subtitle.png', confidence=0.8):
             close_project()
     except Exception as e:
         pass
+    return False
+    
+
 def open_subtitle_edit():
         # Path to Subtitle Edit executable - ADJUST THIS PATH to your installation
         subtitle_edit_path = r"C:\Program Files\Subtitle Edit\SubtitleEdit.exe"

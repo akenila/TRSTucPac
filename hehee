@@ -164,18 +164,24 @@ def generate_auto_subtitles():
                 video_in_panel_pos = (screen_width * 0.1, screen_height * 0.22)
                 pyautogui.click(video_in_panel_pos)
                 time.sleep(2)
+                capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"
+                projects_path = capcut_path + r"\User Data\Projects\com.lveditor.draft"
+                print("Waiting for subtitles to generate...")
                 while True:
-                    time.sleep(3)
-                    # Check if the Run button is still visible
                     try:
-                        run_button_pos = pyautogui.locateCenterOnScreen('./assets/loading.png', confidence=0.8)
+                        project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']][0]
+                        draft = fr"{projects_path}\{project}\draft_content.json"
+                        run_button_pos = os.path.exists(draft)
+                        if run_button_pos==True:
+                            return True
 
-                        if not run_button_pos:
-                            break
+                        time.sleep(2)
                     except Exception as e:
                         break
+                    print(f"Path does not exist: {draft}")
                     print("Waiting for subtitles to generate...")
                 time.sleep(2)
+                return True
             else:
                 print("Could not find Auto Captions button")
                 return False
@@ -187,12 +193,20 @@ def generate_auto_subtitles():
 def close_project():
     """Close the current project"""
     try:
-        gw.getWindowsWithTitle("剪映专业版")[0].close()
-            
-        return True
+            gw.getWindowsWithTitle("剪映专业版")[0].close()
+            time.sleep(5)
+            d=5
+            while d>=0:
+                try:
+                    if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
+                        return True
+                    time.sleep(1)
+                    d-=1
+                except Exception as e:
+                    close_project()
+            close_project()
     except Exception as e:
-        print(f"Error closing project: {e}")
-        return False
+        pass
 def open_subtitle_edit():
         # Path to Subtitle Edit executable - ADJUST THIS PATH to your installation
         subtitle_edit_path = r"C:\Program Files\Subtitle Edit\SubtitleEdit.exe"
@@ -311,9 +325,9 @@ def main():
             project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']]
             for i in project:
                 while True:
-                    if delete_folder(fr"{projects_path}\{i}")==False:
-                        time.sleep(1)
-                        continue
+                    if delete_folder(fr"{projects_path}\{i}")==True or delete_folder(fr"{projects_path}\{i}")==None:
+                        break
+                    time.sleep(1)
 
             for i, video_path in enumerate(video_files):
                 video_name = os.path.basename(video_path)
@@ -334,17 +348,11 @@ def main():
                 # Generate auto subtitles
                 if not generate_auto_subtitles():
                     print(f"Failed to generate subtitles for {video_name}. Skipping...")
-                    
+                print(f"Subtitles generated for {video_name}")
                 # Close the project
                 if not close_project():
                     print(f"Failed to close project for {video_name}.")
-                while True:
-                    try:
-                        if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
-                            break
-                        time.sleep(1)
-                    except Exception as e:
-                        continue
+                print(f"Project closed for {video_name}")
                 get_srt_file(video_name)
             open_subtitle_edit()
             print("\nAll videos processed. Task completed.")

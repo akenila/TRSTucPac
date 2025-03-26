@@ -169,17 +169,10 @@ def generate_auto_subtitles():
                 print("Waiting for subtitles to generate...")
                 while True:
                     try:
-                        project = [p for p in os.listdir(projects_path) if p not in ['.recycle_bin', 'root_meta_info.json']][0]
-                        draft = fr"{projects_path}\{project}\draft_content.json"
-                        run_button_pos = os.path.exists(draft)
-                        if run_button_pos==True:
-                            return True
-
-                        time.sleep(2)
+                        pyautogui.locateCenterOnScreen('./assets/loading.png', confidence=0.8)
                     except Exception as e:
                         break
-                    print(f"Path does not exist: {draft}")
-                    print("Waiting for subtitles to generate...")
+                    time.sleep(5)
                 time.sleep(2)
                 return True
             else:
@@ -211,24 +204,24 @@ def generate_auto_subtitles():
 #     return True
 
 def close_project():
-    time.sleep(4)
-    gw.getWindowsWithTitle("剪映专业版")[0].close()
-    d=5
-    while d>=0:
-        try:
-            if pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8):
-                return True
-            time.sleep(1)
-            d-=1
-        except Exception as e:
-            d-=1
-            pass
+    """Close the current project"""
+    print("Closing project...")
+    
+    # Click on back/close button
     try:
-        if pyautogui.locateCenterOnScreen('./assets/subtitle.png', confidence=0.8):
-            close_project()
-    except Exception as e:
-        pass
-    return False
+        close = pyautogui.locateCenterOnScreen('assets/menu.png', confidence=0.7)
+        pyautogui.click(close)
+    except Exception:
+        print("Could not find close icon")
+        return False
+    
+    time.sleep(2)  # Wait for close confirmation
+    try:
+        close = pyautogui.locateCenterOnScreen('assets/back_home.png', confidence=0.7)
+        pyautogui.click(close)
+    except Exception:
+        print("Could not find close icon")
+        return
     
 
 def open_subtitle_edit():

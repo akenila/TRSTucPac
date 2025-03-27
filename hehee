@@ -206,23 +206,14 @@ def generate_auto_subtitles():
 def close_project():
     """Close the current project"""
     print("Closing project...")
+    time.sleep(2)
     
-    # Click on back/close button
-    try:
-        close = pyautogui.locateCenterOnScreen('assets/menu.png', confidence=0.7)
-        pyautogui.click(close)
-    except Exception:
-        print("Could not find close icon")
-        return False
-    
-    time.sleep(2)  # Wait for close confirmation
-    try:
-        close = pyautogui.locateCenterOnScreen('assets/back_home.png', confidence=0.7)
-        pyautogui.click(close)
-    except Exception:
-        print("Could not find close icon")
-        return
-    
+    width, height = pyautogui.size()
+    pyautogui.click(width*0.05, height*0.01)
+    time.sleep(1)
+    pyautogui.click(width*0.05, height*0.2)
+    time.sleep(1)
+    return True
 
 def open_subtitle_edit():
         # Path to Subtitle Edit executable - ADJUST THIS PATH to your installation

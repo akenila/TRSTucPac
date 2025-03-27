@@ -248,6 +248,7 @@ def open_subtitle_edit():
             print(f"Subtitle Edit successfully saved the file: {srt_file}")
         return True
 def get_srt_file(video_name):
+    time.sleep(3)
     if os.path.exists("Capcut_SRT") == False:
         os.mkdir("Capcut_SRT")
     capcut_path = os.getenv("LOCALAPPDATA") + r"\JianyingPro"

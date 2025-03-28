@@ -213,7 +213,15 @@ def close_project():
     time.sleep(1)
     pyautogui.click(width*0.05, height*0.2)
     time.sleep(1)
-    return True
+    try:
+        close = pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8)
+        if close:
+            return True
+        else:
+            return close_project()
+    except Exception as e:
+        print(f"Failed to close project: {e}")
+        return close_project()
 
 def open_subtitle_edit():
         # Path to Subtitle Edit executable - ADJUST THIS PATH to your installation

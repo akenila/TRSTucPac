@@ -206,17 +206,16 @@ def generate_auto_subtitles():
 def close_project():
     """Close the current project"""
     print("Closing project...")
-    time.sleep(2)
+    time.sleep(3)
     
     width, height = pyautogui.size()
     pyautogui.click(width*0.05, height*0.01)
     time.sleep(1)
-    pyautogui.click(width*0.05, height*0.2)
-    time.sleep(1)
     try:
-        close = pyautogui.locateCenterOnScreen('./assets/create_project.png', confidence=0.8)
+        close = pyautogui.locateCenterOnScreen('./assets/back_home.png', confidence=0.7)
         if close:
-            return True
+                pyautogui.click(width*0.05, height*0.2)
+                time.sleep(1)
         else:
             return close_project()
     except Exception as e:

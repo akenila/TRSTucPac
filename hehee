@@ -252,15 +252,14 @@ def get_srt_file(video_name, output_folder="Capcut_SRT"):
     
     return output_file, output
 
-def open_subtitle_edit(output_folder="Capcut_SRT"):
-    global status_label
+def open_subtitle_edit(output_folder="Capcut_SRT", status_label=None):
     """Open Subtitle Edit for all SRT files in the folder"""
     # Path to Subtitle Edit executable - ADJUST THIS PATH to your installation
     subtitle_edit_path = r"C:\Program Files\Subtitle Edit\SubtitleEdit.exe"
     
     # Get the absolute path to the SRT files folder
     srt_folder = output_folder
-    status_label.config(text=f"Opening Subtitle Edit for {srt_folder}...")
+    status_label.config(text="Opening Subtitle Edit...")
     for file_name in os.listdir(srt_folder):
         srt_file = os.path.join(srt_folder, file_name)
         name = os.path.basename(srt_file)
@@ -604,7 +603,7 @@ def process_videos_thread(video_folder, output_folder, status_label, api_key=Non
                 time.sleep(1)
         
         status_label.config(text="All videos processed. Opening Subtitle Edit...")
-        open_subtitle_edit(output_folder)
+        open_subtitle_edit(output_folder, status_label)
         
         status_label.config(text="Process completed")
         messagebox.showinfo("Success", "All videos have been processed and SRTs created/translated.")

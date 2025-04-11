@@ -259,14 +259,28 @@ def open_subtitle_edit(output_folder="Capcut_SRT", status_label=None):
     
     # Get the absolute path to the SRT files folder
     srt_folder = output_folder
-    status_label.config(text="Opening Subtitle Edit...")
+    if status_label:
+        status_label.config(text="Opening Subtitle Edit...")
+    
+    # Get only .srt files from the folder
+    srt_files = []
     for file_name in os.listdir(srt_folder):
-        srt_file = os.path.join(srt_folder, file_name)
+        if file_name.lower().endswith('.srt'):
+            srt_files.append(os.path.join(srt_folder, file_name))
+    
+    if not srt_files:
+        if status_label:
+            status_label.config(text="No SRT files found in the output folder.")
+        return False
+    
+    # Process each SRT file
+    for srt_file in srt_files:
         name = os.path.basename(srt_file)
         
-        status_label.config(text=f"Opening Subtitle Edit for {name}...")
+        if status_label:
+            status_label.config(text=f"Opening Subtitle Edit for {name}...")
         
-        # Launch Subtitle Edit and open the folder
+        # Launch Subtitle Edit and open the file
         subprocess.Popen([subtitle_edit_path, srt_file])
         while not gw.getWindowsWithTitle(f'{name} - Subtitle Edit'):
             time.sleep(1)
@@ -285,8 +299,8 @@ def open_subtitle_edit(output_folder="Capcut_SRT", status_label=None):
         time.sleep(1)
         gw.getWindowsWithTitle(f'{name} - Subtitle Edit')[0].close()
         print(f"Subtitle Edit successfully saved the file: {srt_file}")
+    
     return True
-
 # Translation functions from UI.py
 def split_chrome_profile_path(full_path):
     if not full_path:

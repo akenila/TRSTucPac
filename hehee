@@ -745,4 +745,6 @@ def main():
     root.mainloop()
 
 if __name__ == "__main__":
+    if not os.path.exists("Capcut_SRT"):
+        os.makedirs("Capcut_SRT")
     main()

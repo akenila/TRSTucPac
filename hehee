@@ -231,6 +231,8 @@ def delete_folder(path):
 
 def get_srt_file(video_name, output_folder="Capcut_SRT"):
     """Extract SRT file from CapCut project"""
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
     time.sleep(3)
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)

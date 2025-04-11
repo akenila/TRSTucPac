@@ -556,7 +556,7 @@ def process_videos_thread(video_folder, output_folder, status_label, api_key=Non
         
         # Process each video
         for i, video_path in enumerate(video_files):
-            video_name = os.path.basename(video_path).split(".")[0]  # Remove extension
+            video_name = os.path.splitext(os.path.basename(video_path))[0]
             status_label.config(text=f"Processing video {i+1}/{len(video_files)}: {video_name}")
             
             # Create new project
